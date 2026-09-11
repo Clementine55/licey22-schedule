@@ -5,22 +5,14 @@ import requests
 import logging
 import os
 import hashlib
-from enum import Enum, auto
 from typing import Optional
+from .common import UpdateStatus
 
 from config import Config
 from app.services.utils.schedule_verification import verify_schedule_file
 
 
 log = logging.getLogger(__name__)
-
-
-class UpdateStatus(Enum):
-    """Статусы завершения операции обновления файла."""
-    SKIPPED = auto()  # Обновление пропущено, файл не менялся
-    SUCCESS = auto()  # Файл успешно скачан и обновлен
-    FAILED = auto()  # Произошла ошибка
-
 
 def _calculate_md5(file_path: str) -> Optional[str]:
     """Вычисляет MD5-хэш локального файла."""

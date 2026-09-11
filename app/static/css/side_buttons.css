@@ -33,10 +33,25 @@
     right: 1.1rem;
 }
 
+@keyframes sideNavInLeft {
+    from { opacity: 0; transform: translateY(-50%) translateX(-40px); }
+    to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+@keyframes sideNavInRight {
+    from { opacity: 0; transform: translateY(-50%) translateX(40px); }
+    to   { opacity: 1; transform: translateY(-50%) translateX(0); }
+}
+
 @media (min-width: 1080px) and (orientation: portrait) {
-    .portrait-view.schedule-selected .side-nav-button,
-    .portrait-view.consultation-mode .side-nav-button {
+    .portrait-view.schedule-selected #side-nav-left,
+    .portrait-view.consultation-mode #side-nav-left {
         display: block;
+        animation: sideNavInLeft 0.4s ease-out backwards;
+    }
+    .portrait-view.schedule-selected #side-nav-right,
+    .portrait-view.consultation-mode #side-nav-right {
+        display: block;
+        animation: sideNavInRight 0.4s ease-out backwards;
     }
 }
 

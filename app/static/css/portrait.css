@@ -8,24 +8,18 @@
 
 /* 1. Настройки контейнера хедера (Позиция и Контент) */
 .portrait-view .header {
-    /* Расположение элементов */
     display: flex;
     justify-content: space-between;
     align-items: center;
     margin-bottom: 1.5rem;
-
-    /* Важно для позиционирования фона */
     z-index: 100;
-
-    /* Убираем фон и блюр отсюда, переносим в ::before */
     background: transparent;
     backdrop-filter: none;
     -webkit-backdrop-filter: none;
-
     transition: all 0.4s ease-in-out;
 }
 
-/* 2. Настройки фона "матовое стекло" с фейдом (Виртуальный слой) */
+/* 2. Фон "матовое стекло" с фейдом (виртуальный слой) */
 .portrait-view .header::before {
     content: "";
     position: absolute;
@@ -33,28 +27,17 @@
     left: 0;
     width: 100%;
     height: calc(100% + 3rem);
-
-    /* Чтобы фон был ПОД текстом */
     z-index: -1;
-
-    /* Сам эффект стекла */
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
-
-    /* --- МАГИЯ ФЕЙДА (Градиентная маска) --- */
-    /* Сверху (black) полностью видно, к низу (transparent) исчезает */
-    /* 85% высоты - четко, последние 15% - плавное исчезновение */
     -webkit-mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
     mask-image: linear-gradient(to bottom, black 75%, transparent 100%);
-
-    /* Блокируем события мыши на свисающей части, чтобы можно было кликать на расписание под ней */
     pointer-events: none;
 }
 
 .portrait-view .logo-img { display: block; max-width: 280px; height: auto; opacity: 0.9; }
 .portrait-view .header-info { display: flex; flex-direction: column; align-items: flex-end; font-weight: bold; font-size: 2.4rem; line-height: 1.4; color: #cbd5e1; }
-.selection-panel { position: fixed; bottom: calc(0.5rem + env(safe-area-inset-bottom)); left: calc(1rem + env(safe-area-inset-left)); right: calc(1rem + env(safe-area-inset-right)); z-index: 1010; background-color: rgba(20, 30, 48, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.9rem 1.5rem; border-radius: 1.5rem; box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.2); max-width: 650px; margin: 0 auto; animation: slideInUp 0.7s ease-out 0.3s both; }
-@media (min-width: 576px) { .selection-panel { left: 50%; transform: translateX(-50%); width: calc(100% - 2rem); } }
+.selection-panel { position: fixed; bottom: calc(0.5rem + env(safe-area-inset-bottom)); left: calc(1rem + env(safe-area-inset-left)); right: calc(1rem + env(safe-area-inset-right)); margin: 0 auto; z-index: 1010; background-color: rgba(20, 30, 48, 0.75); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.9rem 1.5rem; border-radius: 1.5rem; box-shadow: 0 -5px 25px rgba(0, 0, 0, 0.2); max-width: 650px; animation: slideInUp 0.7s ease-out 0.3s both; }
 .selection-panel .btn-toggle { transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out; }
 #show-schedule-btn.btn-primary.active, #show-consultations-btn.btn-primary.active, #back-to-days-btn { background-color: var(--custom-dark-blue) !important; border-color: var(--custom-dark-blue) !important; color: white !important; }
 #back-to-days-btn:hover { background-color: var(--custom-dark-blue-hover) !important; border-color: var(--custom-dark-blue-hover) !important; }
@@ -78,53 +61,188 @@
 .day-selector-btn { width: 100%; max-width: 400px; font-size: 1.5rem; font-weight: 500; padding: 1rem; border-radius: 0.75rem; background-color: rgba(30, 41, 59, 0.8); border: 1px solid rgba(255, 255, 255, 0.1); color: #cbd5e1; transition: all 0.2s ease-in-out; }
 .day-selector-btn:hover { background-color: rgba(51, 65, 85, 0.9); border-color: rgba(255, 255, 255, 0.2); transform: translateY(-3px); color: #fff; }
 
-/* ИЗМЕНЕНИЕ: Убираем пустое место сверху, когда расписание выбрано */
-@media (max-width: 768px) {
+/* ===================================================================
+   === ТЕЛЕФОНЫ И ПЛАНШЕТЫ (портрет, ширина ДО 1079px) ===
+   - панель выбора прибита к низу по центру
+   - логотип/шапка скрываются, когда открыто расписание
+   - боковых кнопок нет
+   =================================================================== */
+@media (max-width: 1079px) and (orientation: portrait) {
     .portrait-view:not(.initial-state) .header {
         opacity: 0;
         transform: translateY(-20px);
         pointer-events: none;
-
-        /* Добавляем правила для полного "схлопывания" элемента, чтобы убрать дыру */
         height: 0;
         padding: 0;
-        margin-bottom: 0; /* Самое важное - убрать нижний отступ */
+        margin-bottom: 0;
         overflow: hidden;
     }
     .portrait-view:not(.initial-state) {
-        /* Уменьшаем верхний отступ, когда расписание показано, оставляя только безопасную зону */
         padding-top: calc(0.5rem + env(safe-area-inset-top));
     }
-
     .portrait-view .header::before {
-        /* Отключаем размытие */
         backdrop-filter: none !important;
         -webkit-backdrop-filter: none !important;
-
-        /* Убираем фон (делаем прозрачным), так как на мобильном */
-        /* шапка обычно не наезжает на контент, а скроллится вместе с ним */
         background-color: transparent !important;
-
-        /* Убираем нижнюю линию */
         border-bottom: none !important;
     }
+    .portrait-view .header-info { display: none; }
 }
-.selection-panel { transition: transform 0.4s ease-in-out, opacity 0.4s ease-in-out; }
-@media (min-width: 768px) and (min-height: 800px) and (orientation: portrait) {
+
+/* Средние/большие планшеты (769–1079, высокие): логотип по центру, отступ под панель */
+@media (min-width: 769px) and (max-width: 1079px) and (min-height: 800px) and (orientation: portrait) {
+    .portrait-view .header { justify-content: center; }
+    .portrait-view .header-info { display: none; }
+    .portrait-view .container { padding-bottom: 12rem; }
+    .selection-panel .form-label { font-size: 0.8rem; }
+    .selection-panel .form-select, .selection-panel .btn { font-size: 0.9rem; padding-top: 0.6rem; padding-bottom: 0.6rem; }
+    .content-spacer { display: none !important; }
+}
+
+
+/* ===================================================================
+   === СЕНСОРНЫЕ ТВ-ТЕРМИНАЛЫ (портрет, ширина ОТ 1080px) ===
+   =================================================================== */
+@media (min-width: 1080px) and (orientation: portrait) {
+    html { font-size: clamp(16px, 0.9vh, 22px); }
+
     .portrait-view { justify-content: center; }
+
     .portrait-view .header {
         position: fixed;
         top: 0;
         left: 0;
         width: 100%;
         box-sizing: border-box;
-        padding: calc(2.0rem + env(safe-area-inset-top)) 5rem 2rem 5rem;
+        padding: calc(2.0rem + env(safe-area-inset-top)) 4rem 2rem 4rem;
         z-index: 10;
-        margin-bottom: 0; }
+        margin-bottom: 0;
+        justify-content: space-between;
+    }
+    .portrait-view .header-info { display: flex; font-size: 2.2rem; }
+    .portrait-view .logo-img { max-width: 18rem; }
 
-        .portrait-view .container { flex-grow: 0; padding-top: 11rem; }
-        .selection-panel { position: static !important; transform: none !important; margin-top: 2.5rem; }
-        .content-spacer { display: none !important; }
-        .portrait-view.schedule-selected .selection-panel, .portrait-view.consultation-mode .selection-panel { opacity: 0; transform: scale(0.9) !important; pointer-events: none; } }
-@media (max-width: 576px) and (orientation: portrait) { html { font-size: 14px; } .portrait-view .header { justify-content: center; } .portrait-view .header-info { display: none; } .selection-panel .form-label { font-size: 0.8rem; } .selection-panel .form-select, .selection-panel .btn { font-size: 0.9rem; padding-top: 0.6rem; padding-bottom: 0.6rem; } }
+    /* Убираем лишний мобильный отступ снизу, чтобы знак вопроса стоял ровно по центру */
+    .portrait-view .initial-prompt {
+        padding-bottom: 2rem !important;
+    }
 
+    .portrait-view .container { 
+        flex-grow: 0; 
+        padding-top: 12rem; 
+        padding-bottom: 8rem !important; 
+    }
+
+    /* 1. Базовые свойства панели */
+    .selection-panel {
+        position: fixed !important;
+        top: 0 !important;
+        left: 50% !important;
+        right: auto !important;
+        bottom: auto !important;
+        margin: 0 !important;
+        width: min(90%, 650px) !important;
+        z-index: 1010;
+        animation: none !important;
+        will-change: transform;
+        transition: transform 0.55s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease-in-out !important;
+    }
+
+    /* 2. Стартовое положение: строго под знаком вопроса (от центра 50vh вниз на фиксированный отступ) */
+    .portrait-view.initial-state .selection-panel {
+        transform: translate(-50%, calc(50vh + 12rem)) !important;
+    }
+
+    /* 3. При выборе класса плавно съезжает к нижнему краю (2rem от пола экрана) */
+    .portrait-view:not(.initial-state) .selection-panel {
+        transform: translate(-50%, calc(100vh - 100% - 2rem)) !important;
+    }
+
+    /* 4. Нежное появление расписания */
+    .portrait-view:not(.initial-state) #schedule-display:not(.is-prompting),
+    .portrait-view:not(.initial-state) #consultation-list-display {
+        animation: gentleMenuAppear 0.45s cubic-bezier(0.16, 1, 0.3, 1) 0.35s both !important;
+    }
+
+    @keyframes gentleMenuAppear {
+        0% {
+            opacity: 0;
+            transform: translateY(25px);
+        }
+        100% {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
+
+    .content-spacer { display: none !important; }
+
+    .portrait-view.schedule-selected .header,
+    .portrait-view.consultation-mode .header {
+        opacity: 1;
+        transform: none;
+        pointer-events: auto;
+    }
+
+    /* Кнопка справки для 1080p с идеальным центрированием знака вопроса */
+    .help-button {
+        width: 50px !important;
+        height: 50px !important;
+        display: inline-flex !important;
+        align-items: center !important;
+        justify-content: center !important;
+        line-height: 1 !important;
+    }
+
+    /* Отступ снизу при открытом расписании: дает возможность прокрутить контент выше панели */
+    .portrait-view:not(.initial-state) .container {
+        padding-bottom: 14rem !important;
+    }
+}
+
+@media (min-width: 1440px) and (orientation: portrait) {
+
+    .portrait-view.initial-state .selection-panel {
+        transform: translate(-50%, calc(50vh + 14rem)) !important;
+    }
+
+    /* 3. При выборе класса плавно съезжает к нижнему краю (2rem от пола экрана) */
+    .portrait-view:not(.initial-state) .selection-panel {
+        transform: translate(-50%, calc(90vh - 100% - 2rem)) !important;
+    }
+
+    /* Кнопка справки для 4K */
+    .help-button {
+        width: 60px !important;
+        height: 60px !important;
+        font-size: 1.8rem !important;
+    }
+
+    /* Увеличенный отступ под расписанием для 4K */
+    .portrait-view:not(.initial-state) .container {
+        padding-bottom: 18rem !important;
+    }
+
+    /* Широкая панель на 4K */
+    .selection-panel {
+        width: min(90%, 950px) !important;
+        padding: 1.2rem 2.2rem !important;
+        max-width: 950px !important;
+        border-radius: 2rem !important;
+    }
+
+    .selection-panel .form-select,
+    .selection-panel .btn {
+        font-size: 1.2rem !important;
+        padding-top: 0.8rem !important;
+        padding-bottom: 0.8rem !important;
+    }
+}
+
+@media (max-width: 576px) and (orientation: portrait) {
+    html { font-size: 14px; }
+    .portrait-view .header { justify-content: center; }
+    .portrait-view .header-info { display: none; }
+    .selection-panel .form-label { font-size: 0.8rem; }
+    .selection-panel .form-select, .selection-panel .btn { font-size: 0.9rem; padding-top: 0.6rem; padding-bottom: 0.6rem; }
+}

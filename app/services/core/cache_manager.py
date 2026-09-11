@@ -13,12 +13,13 @@ from app.utils import make_json_serializable
 from .backup_manager import create_backup, clean_old_backups, get_latest_backup_path
 
 from app.services.clients.time_service import get_current_day_and_time
-from app.services.clients.yandex_disk_client import update_schedule_file_if_changed, UpdateStatus
-
+from app.services.clients import yandex_disk_client
+from app.services.clients import seafile_client
 
 from app.services.utils.excel_reader import open_excel_file
 from app.services.utils.schedule_comparator import compare_schedules
 from app.services.utils.enums import DayType
+from app.services.clients.common import UpdateStatus
 
 from app.services.parsers.short_day_parser import get_short_days_from_file
 from app.services.parsers.schedule_parser import parse_schedule
@@ -96,12 +97,21 @@ def _update_cache_file(schedule_name: str, cache_file: str) -> Tuple[bool, str]:
     """
     Внутренняя функция для скачивания, парсинга и сохранения данных в кэш.
     """
+
+    # --- ШАГ 1: ПРОВЕРЯЕМ И ОБНОВЛЯЕМ ФАЙЛ С СЕРВЕРА ---
     schedule_config = Config.SCHEDULES[schedule_name]
-    yandex_path = schedule_config['yandex_path']
+    remote_path = schedule_config['remote_path']
     local_path = schedule_config['local_path']
 
-    # --- ШАГ 1: ПРОВЕРЯЕМ И ОБНОВЛЯЕМ ФАЙЛ С ЯНДЕКС.ДИСКА ---
-    update_status = update_schedule_file_if_changed(yandex_path, local_path)
+    if Config.CLOUD_SERVICE == 'LIS':
+        update_status = seafile_client.update_schedule_file_if_changed(
+            schedule_config['repo_id'], remote_path, local_path
+        )
+    else:
+        update_status = yandex_disk_client.update_schedule_file_if_changed(
+            remote_path, local_path
+        )
+
 
     # --- ШАГ 2: ОБРАБАТЫВАЕМ РЕЗУЛЬТАТ ОБНОВЛЕНИЯ ---
 
